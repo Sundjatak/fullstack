@@ -10,11 +10,11 @@ import (
 )
 
 type Post struct {
-	ID        uint32    `gorm:"primary_key;auto_increment" json:"id"`
+	ID        uint64    `gorm:"primary_key;auto_increment" json:"id"`
 	Title     string    `gorm:"size:255;not null;unique" json:"title"`
-	Content   string    `gorm:"size:100;not null;unique" json:"email"`
-	Author    User      `json:"password"`
-	AuthorID  uint32    `gorm:"not null" json:"password"`
+	Content   string    `gorm:"size:100;not null;unique" json:"content"`
+	Author    User      `json:"author"`
+	AuthorID  uint32    `gorm:"not null" json:"author_id"`
 	CreatedAt time.Time `gorm:"default:CURRENT_TIMESTAMP" json:"created_at"`
 	UpdatedAt time.Time `gorm:"default:CURRENT_TIMESTAMP" json:"updated_at"`
 }
@@ -78,7 +78,9 @@ func (p *Post) FindPostByID(db *gorm.DB, pid uint64) (*Post, error) {
 }
 
 func (p *Post) UpdateAPost(db *gorm.DB) (*Post, error) {
+
 	var err error
+
 	err = db.Debug().Model(&Post{}).Where("id = ?", p.ID).Updates(Post{Title: p.Title, Content: p.Content, UpdatedAt: time.Now()}).Error
 	if err != nil {
 		return &Post{}, err
@@ -89,10 +91,12 @@ func (p *Post) UpdateAPost(db *gorm.DB) (*Post, error) {
 			return &Post{}, err
 		}
 	}
+
 	return p, nil
 }
 
 func (p *Post) DeleteAPost(db *gorm.DB, pid uint64, uid uint32) (int64, error) {
+
 	db = db.Debug().Model(&Post{}).Where("id = ? and author_id = ?", pid, uid).Take(&Post{}).Delete(&Post{})
 
 	if db.Error != nil {

@@ -19,8 +19,8 @@ var users = []models.User{
 		Password: "password",
 	},
 }
-
 var posts = []models.Post{
+
 	models.Post{
 		Title:   "Title 1",
 		Content: "Hello world 1",
